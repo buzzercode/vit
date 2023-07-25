@@ -52,7 +52,7 @@ if __name__ == '__main__':
     scheduler = StepLR(optimizer, step_size=50, gamma=0.1)
 
     criterion = CrossEntropyLoss()
-    for epoch in trange(N_EPOCHS, desc="Training"):
+    for epoch in range(N_EPOCHS):
         train_loss = 0.0
         correct, total = 0, 0
         acc_max = 0
