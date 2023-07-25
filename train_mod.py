@@ -34,7 +34,6 @@ if __name__ == '__main__':
     if not os.path.exists('/work/mohsin/transfor_flower102/weights'):
         os.makedirs('/work/mohsin/transfor_flower102/weights')
 
-
     transform=transforms.Compose([transforms.Resize([256,256]),transforms.ToTensor()])
 
     train_set = data.Flowers102(root='./../datasets', split = 'test', download=True, transform=transform)
@@ -43,14 +42,14 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Using device: ", device, f"({torch.cuda.get_device_name(device)})" if torch.cuda.is_available() else "")
     model = MyViT((3, 256, 256), n_patches=1, n_blocks=12, hidden_d=768, n_heads=12, out_d=102).to(device)
-    N_EPOCHS = 100
-    LR = 0.05
+    N_EPOCHS = 300
+    LR = 0.000005
 
     if resume == "true":
         model.load_state_dict(torch.load('/work/mohsin/transfor_flower102/weights/oxford_custom_big_final.pth'))
 
     optimizer = Adam(model.parameters(), lr=LR)
-    scheduler = StepLR(optimizer, step_size=15, gamma=0.1)
+    scheduler = StepLR(optimizer, step_size=50, gamma=0.1)
 
     criterion = CrossEntropyLoss()
     for epoch in trange(N_EPOCHS, desc="Training"):
@@ -58,7 +57,7 @@ if __name__ == '__main__':
         correct, total = 0, 0
         acc_max = 0
 
-        for batch in tqdm(train_loader, desc=f"Epoch {epoch + 1} in training", leave=False):
+        for batch in train_loader:
             x, y = batch
             x, y = x.to(device), y.to(device)
             y_hat = model(x)
