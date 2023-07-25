@@ -31,16 +31,10 @@ if __name__ == '__main__':
     args = parse_arguments()
     resume = args.resume
 
-    if not os.path.exists('weights'):
-        os.makedirs('weights')
+    if not os.path.exists('/work/mohsin/transfor_flower102/weights'):
+        os.makedirs('/work/mohsin/transfor_flower102/weights')
 
-    if not os.path.exists('results'):
-        os.makedirs('results')
 
-    file_path = "results/oxford_custom_big.txt"
-    with open(file_path, "a") as file:
-        text = "\nBatch:32   Patches:1   Blocks:12   Hidden:768   Heads:12   Custom Patch\n"
-        file.write(text)
     transform=transforms.Compose([transforms.Resize([256,256]),transforms.ToTensor()])
 
     train_set = data.Flowers102(root='./../datasets', split = 'test', download=True, transform=transform)
@@ -53,7 +47,7 @@ if __name__ == '__main__':
     LR = 0.05
 
     if resume == "true":
-        model.load_state_dict(torch.load('weights/oxford_custom_big_final.pth'))
+        model.load_state_dict(torch.load('/work/mohsin/transfor_flower102/weights/oxford_custom_big_final.pth'))
 
     optimizer = Adam(model.parameters(), lr=LR)
     scheduler = StepLR(optimizer, step_size=15, gamma=0.1)
@@ -82,14 +76,11 @@ if __name__ == '__main__':
 
         print(f"Epoch {epoch + 1}/{N_EPOCHS} loss: {train_loss:.2f} Accuracy: {correct / total * 100:.2f}%")
         acc_current = correct / total * 100
-        with open(file_path, "a") as file:
-            text = "\nEpoch: " + str(epoch + 1) + " ,loss: "+ str(train_loss) + " ,Accuracy: "+ str(acc_current)
-            file.write(text)
 
         if (acc_current > acc_max):
             acc_max = acc_current
-            name = 'weights/oxford_custom_big_max.pth'
+            name = '/work/mohsin/transfor_flower102/weights/oxford_custom_big_max.pth'
             torch.save(model.state_dict(), name)
 
-        torch.save(model.state_dict(), 'weights/oxford_custom_big_final.pth')
+        torch.save(model.state_dict(), '/work/mohsin/transfor_flower102/weights/oxford_custom_big_final.pth')
     print("Training Done.")
